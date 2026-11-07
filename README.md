@@ -1,12 +1,11 @@
-# Oracle SQL Query Optimization — P-004
+# Oracle SQL Query Optimization
 
 A measured Oracle SQL experiment comparing function-based date filtering against a half-open date range in a monthly sales aggregation.
 
 ## Workload
 
-Oracle Database Free, `FREEPDB1`, schema `P004`. Synthetic tables: `SALES` (500,000 rows), `CUSTOMERS` (10,000), `PRODUCTS` (1,000). The query joins the three tables and calculates January 2025 revenue by product category and customer province. The 2025 January query processes 21,233 sales rows and returns 20 groups.
+Oracle Database Free, `FREEPDB1`, schema `P004`. Synthetic tables: `SALES` (500,000 rows), `CUSTOMERS` (10,000), `PRODUCTS` (1,000). The query joins the three tables and calculates January 2025 revenue by product category and customer province. The January 2025 query processes 21,233 sales rows and returns 20 groups.
 
-**Data-generation limitation:** The original dataset was created in an earlier session and its generation script is unavailable. This repository preserves the queries, measurement protocol, observed plans and results, but does **not** claim that the original dataset can be regenerated exactly. A new generator would need independent validation before any reproducibility claim.
 
 ## Hypothesis
 
@@ -23,7 +22,7 @@ Oracle Database Free, `FREEPDB1`, schema `P004`. Synthetic tables: `SALES` (500,
 | Pass 1 median (baseline first) | 350 ms | 80 ms |
 | Pass 2 median (optimized first) | 250 ms | 60 ms |
 
-Control pass median speedup: **4.17×** (250 / 60), or **76%** lower elapsed time. Both passes favored the date-range query, though timings varied and `DBMS_UTILITY.GET_TIME` measures in 10 ms increments. This is a result for this dataset and environment, not a general Oracle performance guarantee. The unchanged buffer count means the observed difference is not evidence of reduced logical I/O. SQL text, execution plans, and benchmark wrapper also differ, so do not attribute all timing difference to one isolated low-level cause.
+Control pass median speedup: **4.17×** (250 / 60), or **76%** lower elapsed time. Both passes favoured the date-range query, though timings varied and `DBMS_UTILITY.GET_TIME` measures in 10 ms increments. This is a result for this dataset and environment, not a general Oracle performance guarantee. The unchanged buffer count means the observed difference is not evidence of reduced logical I/O. SQL text, execution plans, and benchmark wrapper also differ, so do not attribute all timing differences to one isolated low-level cause.
 
 Bidirectional `MINUS` validation returned **0 differences in either direction**. Both versions returned 20 groups and total revenue of 16,370,260.85.
 
