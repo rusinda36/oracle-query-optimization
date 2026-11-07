@@ -1,0 +1,29 @@
+Oracle DB FREEPDB1, schema P004. Actual plans captured with DBMS_XPLAN.DISPLAY_CURSOR(NULL,NULL,'ALLSTATS LAST').
+
+BASELINE: SQL_ID 51bhw1k1n5ch0; plan hash 942003630
+Operation                   E-Rows  A-Rows  Buffers
+SELECT STATEMENT                       20     2394
+ HASH GROUP BY                15       20     2394
+  HASH JOIN                   50    21233     2394
+   HASH JOIN                  50    21233     2346
+    TABLE ACCESS FULL SALES   50    21233     2340
+    TABLE ACCESS FULL PRODUCTS 1000  1000        6
+   TABLE ACCESS FULL CUSTOMERS 10000 10000       48
+Predicate: EXTRACT(YEAR FROM SALE_DATE)=2025 AND EXTRACT(MONTH FROM SALE_DATE)=1
+Single SQL Developer elapsed: 104 ms
+
+OPTIMIZED: SQL_ID 37xk94butumfm; plan hash 3606125837
+Operation                   E-Rows  A-Rows  Buffers
+SELECT STATEMENT                       20     2394
+ HASH GROUP BY                15       20     2394
+  HASH JOIN                21947    21233     2394
+   TABLE ACCESS FULL CUSTOMERS 10000 10000       48
+   HASH JOIN               21947    21233     2346
+    TABLE ACCESS FULL PRODUCTS 1000 1000         6
+    TABLE ACCESS FULL SALES 21947  21233     2340
+Predicate: SALE_DATE >= DATE '2025-01-01' AND SALE_DATE < DATE '2025-02-01'
+Single SQL Developer elapsed: 34 ms
+
+Both versions returned 20 result groups. Bidirectional MINUS validation: 0 differences each way.
+An index IDX_SALES_DATE was created, but Oracle chose TABLE ACCESS FULL in both plans.
+These are transcriptions of observed runtime plan values, not a fresh database export.
